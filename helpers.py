@@ -1,7 +1,6 @@
 #helpers.py
 import config
 import re
-import io
 
 def AddEmojiRequestToPrompt(prompt):
     prompt = prompt + config.appendEmojiRequest
