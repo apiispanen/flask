@@ -13,7 +13,7 @@
 
     // Socket IO
     // connect to the server, based on the current URL and add port
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('https://' + document.domain + ':' + location.port);
 
     socket.on('response', function (data) {
 
