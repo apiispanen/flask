@@ -15,8 +15,12 @@ conn = pymysql.connect(
 )
 
 # Create a cursor object to execute SQL queries
-cursor = conn.cursor()
-
+try:
+    cursor = conn.cursor()
+except:
+    print("Connection failed")
+    cursor = None
+    
 def find_entities(cursor=cursor):
     # List of attribute codes
     attribute_codes = ["length", "voltage", "price"]

@@ -30,7 +30,9 @@ conversation_log = []
 @socketio.on('message')
 def handle_message(data):
     full_message = ''
+    load_dotenv()
     API_KEY = os.getenv("API_KEY")
+    print(API_KEY)
     openai.api_key = API_KEY  # ensure API key is set locally
     prompt = "You are Machinelle, a store clerk for Direct Machines, a metal machinery ecommerce retailer. Please handle the following customer request, being sure to be as helpful as possible:\n"+ data['prompt']
 
