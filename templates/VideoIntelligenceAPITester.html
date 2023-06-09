@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+<h3>{{ message }}</h3>
+
+<label>Enter video path of google cloud storage for testing purposes here: </label>
+<form method="post" action="/api/VideoIntelligenceAPITester">
+    <textarea name="path" rows="5" cols="50"></textarea><br><br>
+    <input type="submit" value="Submit">
+</form>
+    {% if response %}
+<h2>Response:</h2>
+<pre>{{ response}}</pre>
+<h2>Response in JSON:</h2>
+<pre>{{ response | tojson }}</pre>
+
+    {% endif %}
+
+{% endblock %}

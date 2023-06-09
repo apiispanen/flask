@@ -1,0 +1,82 @@
+sentence,intent
+Do you offer delivery and installation?,delivery_installation
+How soon can the GHI punch be delivered and installed?,delivery_installation
+What's the delivery timeline for the VWX punch?,delivery_installation
+Do you offer installation services for the ABC machine?,delivery_installation
+What is the delivery process for the PQR fabricator?,delivery_installation
+How quickly can you deliver the 567 machine?,delivery_installation
+Do you provide on-site installation for the JKL cutter?,delivery_installation
+Can I schedule the delivery of the 234 fabricator for a specific date?,delivery_installation
+What is the delivery time for JKL bender?,delivery_installation
+How quickly can you deliver the MNO fabricator?,delivery_installation
+How much does the ABC metal fabricator cost?,price_inquiry
+Are there any discounts available on the JKL machines?,discount_inquiry
+Can you give me a price estimate for the DEF welder?,price_inquiry
+What's the price of a doall Bandsaw?,price_inquiry
+What is the sales tax for a metal laser?,price_inquiry
+Do you offer any discounts or promotions on the STU fabricator?,discount_inquiry
+How much does the 890 fabricator cost?,price_inquiry
+Can I get a quote for the MNO welder?,price_inquiry
+Are there any financing options for the 234 fabricator?,financing_inquiry
+Can I trade in my old GHI welder for a discount on a new one?,discount_inquiry
+What is the price difference between the VWX and YZ1 welders?,price_inquiry
+Are there any ongoing promotions for the MNO welder?,discount_inquiry
+Do you offer financing options?,financing_inquiry
+Is financing available for the ABC fabricator?,price_inquiry
+Can the STU machine be used for engraving?,product_inquiry
+Can the JKL bender handle both cutting and shaping?,product_inquiry
+Is the 567 cutter suitable for heavy-duty use?,product_inquiry
+How can I place an order?,product_inquiry
+Can I buy replacement parts for the 234 welder?,product_inquiry
+Can you tell me more about the XYZ metal cutter?,product_inquiry
+What materials can the MNO cutter handle?,product_inquiry
+What's the best machine for metal cutting?,product_inquiry
+Do you have a machine that can cut through stainless steel?,product_inquiry
+Does the 890 welder come with any accessories?,product_inquiry
+Is the XYZ machine suitable for heavy-duty metal cutting?,product_inquiry
+Does the MNO machine work well for stainless steel?,product_inquiry
+Is the 234 cutter good for precision work?,product_inquiry
+Can the GHI machine handle aluminum and copper?,product_inquiry
+Is the VWX punch suitable for engraving as well?,product_inquiry
+Can the ABC cutter also handle shaping and bending?,product_inquiry
+Is the PQR punch recommended for commercial use?,product_inquiry
+How does the 890 punch perform with different types of metals?,product_inquiry
+How long does the VWX machine last with regular use?,product_inquiry
+What kind of maintenance is required for the GHI punch?,support_maintenance
+What kind of regular maintenance does the JKL cutter require?,support_maintenance
+How often should I service the DEF punch?,support_maintenance
+What should I do if my STU machine needs repair?,support_maintenance
+Can you help me with troubleshooting my MNO fabricator?,support_maintenance
+Do you offer any training or tutorials for using the 567 machine?,support_maintenance
+What are the technical specifications of the DEF welder?,technical_specifications
+Can I use the PQR machine for aluminum?,technical_specifications
+What's the operating voltage of the STU welder?,technical_specifications
+What's the maximum thickness the 234 cutter can handle?,technical_specifications
+What are the dimensions of the PQR welder?,technical_specifications
+What's the maximum thickness the ABC fabricator can handle?,technical_specifications
+Can you tell me more about the safety features of the PQR welder?,technical_specifications
+What software is compatible with the 567 welder?,technical_specifications
+What are the operating voltage and power requirements of the JKL cutter?,technical_specifications
+What is the maximum operating temperature of the YZ1 welder?,technical_specifications
+What are the dimensions and weight of the DEF machine?,technical_specifications
+What are the maintenance requirements for the STU machine?,technical_specifications
+What is the warranty period for the YZ1 machine?,warranty_info
+How can I extend the warranty on my 890 punch?,warranty_info
+How can I extend the warranty on my GHI punch?,warranty_info
+What is the warranty on your machines?,warranty_info
+How long is the warranty period for the GHI machine?,warranty_info
+What's the standard warranty time for the welders?,warranty_info
+What's the current price of the XYZ fabricator?,price_inquiry
+Do you have any discounts on the PQR plasma cutter?,discount_inquiry
+Is the STU lathe machine on sale?,discount_inquiry
+Are there any promotional offers for the VWX drill press?,discount_inquiry
+Can I get a reduced price for the YZ1 router?,discount_inquiry
+How much does the ABC machine cost?,price_inquiry
+What's the selling price for the GHI laser cutter?,price_inquiry
+Can I get a price quote for the DEF punch press?,price_inquiry
+How much do I need to pay for the JKL band saw?,price_inquiry
+Do you offer financing options for the ABC welder?,financing_inquiry
+Are there any installment plans available for the DEF bender?,financing_inquiry
+Can I finance the GHI press brake?,financing_inquiry
+Is there a payment plan for the JKL grinder?,financing_inquiry
+What are the financing terms for the MNO shear?,financing_inquiry
