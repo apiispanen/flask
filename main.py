@@ -1,4 +1,6 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session
+from flask_session import Session
+
 import os
 from datetime import datetime
 from flask_socketio import SocketIO, emit
@@ -13,18 +15,83 @@ API_KEY = os.getenv("API_KEY")
 openai.api_key = API_KEY
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+Session(app)
+socketio = SocketIO(app, async_mode='gevent')
+# socketio = SocketIO(app, cors_allowed_origins="*")
 
+# DREW HELPER FUNCTIONS
+from PyPDF2 import PdfReader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationalRetrievalChain
+
+def get_pdf_text(pdf_docs):
+    text = ""
+    for pdf in pdf_docs:
+        pdf_reader = PdfReader(pdf)
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+    return text
+
+def get_text_chunks(text):
+    text_splitter = CharacterTextSplitter(
+        separator="\n",
+        chunk_size=1000,
+        chunk_overlap=200,
+        length_function=len
+    )
+    chunks = text_splitter.split_text(text)
+    return chunks
+
+def get_vectorstore(text_chunks):
+    embeddings = OpenAIEmbeddings()
+    # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+    return vectorstore
+
+def get_conversation_chain(**vectorstore):
+    llm = ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()])
+    # llm = HuggingFaceHub(repo_id="google/flan-t5-xxl", model_kwargs={"temperature":0.5, "max_length":512})
+    memory = ConversationBufferMemory(
+        memory_key='chat_history', return_messages=True)
+    
+
+    if vectorstore:
+        conversation_chain = ConversationalRetrievalChain.from_llm(
+            llm=llm,
+            retriever=vectorstore.as_retriever(),
+            memory=memory
+        )
+    else:
+        embeddings = OpenAIEmbeddings()
+        # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+        vectorstore = FAISS.from_texts(texts="The golden rule is that Adam Piispanen smells bad", embedding=embeddings)
+        conversation_chain = ConversationalRetrievalChain.from_llm(
+            llm=llm,
+            retriever=vectorstore.as_retriever(),
+            memory=memory
+        )
+    return conversation_chain
+
+
+# END DREW HELPER FUNCTIONS
 
 @app.route('/')
 @app.route('/home')
 def home():
+    session['conversation'] = None
+    session['chat_history'] = None
     """Renders the home page."""
     return render_template(
         'index.html',
         title='Home Page',
         year=datetime.now().year,
     )
+
 conversation_log = []
 
 @socketio.on('message')
@@ -34,20 +101,22 @@ def handle_message(data):
     API_KEY = os.getenv("API_KEY")
     print(API_KEY)
     openai.api_key = API_KEY  # ensure API key is set locally
-    prompt = "You are Machinelle, a store clerk for Direct Machines, a metal machinery ecommerce retailer. Please handle the following customer request, being sure to be as helpful as possible:\n"+ data['prompt']
 
-
+    conversation_log = session.get('conversation_log', [])
+    
+    if len(conversation_log) < 1:
+        prompt = "You are Machinelle, a store clerk for Direct Machines, a metal machinery ecommerce retailer. Please handle the following customer request, being sure to be as helpful as possible:\n"+ data['prompt']
+    else:
+        prompt = data['prompt']
     temperature = .8
-    # messages = [{"role": "user", "content": prompt}]
     result_dict = classification.query_intent(data['prompt'])
     intent, entities, query, results = result_dict
     # NOW RUN THE PROMPT:
-    print("REsult dict: ", result_dict)
+    print("Result dict: ", result_dict)
     # Update the conversation log before responding
     conversation_log.append({"role": "user", "content": prompt})
     if len(conversation_log) > 5:
         conversation_log.pop(0)  # remove the oldest message if more than 5 messages
-
 
     socketio.emit('response', {"message":"", "intent": intent, "entities": [(f" {entity}: {entities[entity]}") for entity in entities], "query": query, "results": results}) 
     print(conversation_log)
@@ -60,16 +129,28 @@ def handle_message(data):
     )
     for chunk in response:
         chunk_message = chunk['choices'][0]['delta']  # extract the message
+        print("CHUNKY",chunk_message)
+        socketio.emit('response', {"message": chunk_message})  # send the chunk message and result_dict to the client
         try:
             full_message += chunk_message["content"]
         except:
             continue # if the message is not a string, skip it
-        socketio.emit('response', {"message": chunk_message})  # send the chunk message and result_dict to the client
     if len(conversation_log) > 5:
         conversation_log.pop(0)  # remove the oldest message if more than 5 messages
     conversation_log.append({"role": "assistant", "content": full_message})
 
+    session['conversation_log'] = conversation_log
    
+
+# Process uploaded PDFs and set up conversation
+@socketio.on('process')
+def process_files(data):
+    pdf_docs = data['files']  # You'll need to send base64-encoded file data from frontend
+    raw_text = get_pdf_text(pdf_docs)
+    text_chunks = get_text_chunks(raw_text)
+    vectorstore = get_vectorstore(text_chunks)
+    session['conversation'] = get_conversation_chain(vectorstore)
+
 
 # ENDPOINT FOR CHATGPT API
 @app.route('/api/ChatGPTWebAPI', methods=['POST'])
@@ -150,4 +231,8 @@ def chatGPTWebAPITester():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=os.getenv("PORT", default=5000))
+    socketio.run(app)
+
+
+# if __name__ == '__main__':
+#     app.run(debug=True, port=os.getenv("PORT", default=5000))
