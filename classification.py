@@ -145,16 +145,19 @@ def query_intent(text):
     # text = request.json.get('text')
     try:
         intent = predict_intent(text) # Can be done with the NLP cloud API
-    except:
+    except Exception as e:
         intent = ""
+        print("(*&@#(!*@#*&!@#*&^#*&^#*&!^@#*&!^@# ERROR:",e)
     try:
         entities = extract_entities(text)
-    except:
+    except Exception as e:
         entities = {}
+        print("(*&@#(!*@#*&!@#*&^#*&^#*&!^@#*&!^@# ERROR:",e)
     try:
         query = generate_query(intent, entities)
-    except:
+    except Exception as e:
         query = ""
+        print("(*&@#(!*@#*&!@#*&^#*&^#*&!^@#*&!^@# ERROR:",e)
     try:
         results = execute_query(query) # ONCE WE HOOK UP THE DB THIS IS WHERE WE'LL EXECUTE THE QUERY
     except Exception as e:
