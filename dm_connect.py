@@ -6,21 +6,20 @@ dbname = 'drew_mage10dec'
 username = 'drew_mage433'
 password = '34Vp))90Sh'
 
-# Establish a connection to the database
-conn = pymysql.connect(
-    host=host,
-    user=username,
-    password=password,
-    database=dbname
-)
-
 # Create a cursor object to execute SQL queries
 try:
+    # Establish a connection to the database
+    conn = pymysql.connect(
+        host=host,
+        user=username,
+        password=password,
+        database=dbname
+    )
     cursor = conn.cursor()
 except:
     print("Connection failed")
     cursor = None
-    
+
 def find_entities(cursor=cursor):
     # List of attribute codes
     attribute_codes = ["length", "voltage", "price"]
