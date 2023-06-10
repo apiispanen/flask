@@ -5,94 +5,79 @@
 <script>
     var i = 0;
     $(function() {
-    var chatWindow = $('#chat-window');
-    var responseDiv;
-    var i = 0;
-
-    var protocol = location.protocol;
-    var socket = io.connect(protocol + '//' + document.domain + ':' + location.port);
-
-    // Socket response
-    socket.on('response', function (data) {
+      var chatWindow = $('#chat-window');
+      var responseDiv;
+    
+      function createResponseDiv() {
+        var responseDivName = "response-text-" + i;
+        responseDiv = $('<div class="bg-gray-300 p-3 mt-4 rounded-r-lg rounded-bl-lg hidden"><p class="text-sm" id="'+ responseDivName +'"></p></div>');
+        return responseDiv;
+      }
+      
+      createResponseDiv();
+      chatWindow.append(responseDiv);
+    
+      var protocol = location.protocol;
+      var socket = io.connect(protocol + '//' + document.domain + ':' + location.port);
+  
+      socket.on('response', function (data) {
         console.log("data", data);
-
-        var p = $('<b></b>');
+    
+        var p = $('<span></span>');
         p.addClass('text-sm');
-        p.text(data['message']['content']);
-        
-        if (responseDiv) {
-            responseDiv.removeClass('hidden');
-
-            responseDiv.children('p').append(p);
-        }
-
-        // Scroll to the bottom of the chat window
+        var content = data['message']['content'];
+        p.text(content ? content + ' ' : ''); 
+  
+        responseDiv.children('p').append(p);
+        responseDiv.removeClass('hidden');
         chatWindow.scrollTop(chatWindow[0].scrollHeight);
-
-        // Hide the spinner
         $('#spinner').addClass('hidden');
-    });
-
-    // Emit initial message
-    socket.emit('message', { prompt: 'Hello, GPT!' });
-
-    // Chat form submit
-    $("#chat-form").on('submit', function(e) {
+      });
+      
+      socket.emit('message', { prompt: 'Hello, GPT!' });
+  
+      $("#chat-form").on('submit', function(e) {
         e.preventDefault();
-        responseDiv = $('<div class="bg-gray-300 p-3 mt-4 hidden rounded-r-lg rounded-bl-lg" id="'+responseDivName+'"><p class="text-sm"></p></div>');
-        chatWindow.append(responseDiv);
-
         var userResponse = $('#prompt').val();
         socket.emit('message', { prompt: userResponse });
-
+    
         $('#spinner').removeClass('hidden');
-        
+    
         chatWindow.append('<div class="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end">' +
-            '<div>' +
-                '<div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">' +
-                    '<p class="text-sm">' + userResponse + '<br>' + '</p>' +
-                '</div>'  +
-            '</div>' +
-            '<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>' +
+          '<div>' +
+              '<div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">' +
+                  '<p class="text-sm">' + userResponse + '<br>' + '</p>' +
+              '</div>'  +
+          '</div>' +
+          '<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>' +
         '</div>');
-
+    
         chatWindow.scrollTop(chatWindow[0].scrollHeight);
-        
-        // Create a new responseDiv for each new message
-        var responseDivName = "response-text-" + i++;
-        responseDiv = $('<div class="bg-gray-300 p-3 mt-4 hidden rounded-r-lg rounded-bl-lg" id="'+responseDivName+'"><p class="text-sm"></p></div>');
+  
+        i++;
+        createResponseDiv();
         chatWindow.append(responseDiv);
-
-        responseDiv.append('<span class="just-now text-xs text-gray-500 leading-none">Just now</span>')
-    });
-
-    // File upload handler
-    function handleFileUpload(event) {
+      });
+    
+      function handleFileUpload(event) {
         var file = event.target.files[0];
     
         if (file) {
-            var reader = new FileReader();
-        
-            reader.onload = function(e) {
-                var base64Data = e.target.result.split(',')[1]; // Remove the data:... base64, prefix
-        
-                // Now send this data to the server
-                socket.emit('process', { files: base64Data });
-            };
-        
-            reader.readAsDataURL(file);
+          var reader = new FileReader();
+    
+          reader.onload = function(e) {
+            var base64Data = e.target.result.split(',')[1];
+            socket.emit('process', { files: base64Data });
+          };
+    
+          reader.readAsDataURL(file);
         }
-    }
-
-    // Bind the file upload handler to the input element
-    $("#file-upload").on('change', function(e) {
-        handleFileUpload(e);
+      }
+  
+      document.getElementById('file-upload').addEventListener('change', handleFileUpload, false);
     });
-});
-
-
-</script>
-        
+  </script>
+          
 {% extends "layout.html" %}
 
 {% block content %}
@@ -116,7 +101,7 @@
                 <input id="prompt" name="prompt" type="text" placeholder="Type your message…" class="flex-grow outline-none">
                 <button type="submit" class="ml-2 bg-blue-600 text-white px-3 py-1 rounded">Send</button>
             </form>
-            <input id="file-upload" type="file" name="file" onchange="handleFileUpload(event)"> <!-- File upload button -->
+            <input id="file-upload" type="file" name="file" > <!-- File upload button -->
 
         </div>
 
@@ -135,4 +120,13 @@
 </div>
 
 
+// var intent_h = $('#intent');
+// var entity_h = $('#entities');
+// var query_h = $('#query');
+// var results_h = $('#results');
+
+
+// intent_h.text(data['intent']);
+// entity_h.text(data['entities']);
+// query_h.text(data['query']);
 {% endblock %}

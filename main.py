@@ -29,12 +29,30 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 
-def get_pdf_text(pdf_docs):
-    text = ""
-    for pdf in pdf_docs:
-        pdf_reader = PdfReader(pdf)
-        for page in pdf_reader.pages:
-            text += page.extract_text()
+from PyPDF2 import PdfReader
+import io
+import base64
+
+def get_pdf_text(base64_pdf):
+    # Decode the base64 string into bytes
+    pdf_bytes = base64.b64decode(base64_pdf)
+
+    # Convert the bytes to a stream
+    pdf_stream = io.BytesIO(pdf_bytes)
+
+    # Now use PdfReader to read the stream
+    pdf_reader = PdfReader(pdf_stream)
+
+    # Initialize the 'text' variable
+    text = ''
+
+    # Iterate through pages and extract text
+    for page in pdf_reader.pages:
+        # Append the extracted text to 'text'
+        text += page.extract_text()
+
+    # Rest of your code goes here...
+
     return text
 
 def get_text_chunks(text):
@@ -104,7 +122,7 @@ def handle_message(data):
 
     conversation_log = session.get('conversation_log', [])
     
-    if len(conversation_log) < 1:
+    if len(conversation_log) < 2:
         prompt = "You are Machinelle, a store clerk for Direct Machines, a metal machinery ecommerce retailer. Please handle the following customer request, being sure to be as helpful as possible:\n"+ data['prompt']
     else:
         prompt = data['prompt']
