@@ -19,3 +19,4 @@ python-dotenv
 gevent
 Flask-Session
 PyPDF2
+langchain
