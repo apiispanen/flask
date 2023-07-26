@@ -1,0 +1,111 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(function() {
+    $("#chat-form").on('submit', function(e) {
+        e.preventDefault();
+        var userResponse = $('#prompt').val();
+        var chatWindow = $('#chat-window');
+
+        $('#spinner').removeClass('hidden'); // Show the spinner
+
+        chatWindow.append('<div class="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end">' +
+                        '<div>' +
+                            '<div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">' +
+                                '<p class="text-sm">' + userResponse + '<br>' + '</p>' +
+                            '</div>' +
+                            '<span class="just-now text-xs text-gray-500 leading-none">Just now</span>' +
+                        '</div>' +
+                        '<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>' +
+                    '</div>');
+        chatWindow.scrollTop(chatWindow[0].scrollHeight);
+
+
+        $.ajax({
+            url: '/api/ChatGPTWebAPI',
+            data: JSON.stringify({ prompt: userResponse }),
+            type: 'POST',
+            contentType: 'application/json',
+            success: function(response) {
+                var botResponse = response.message;
+                var results = response.results;
+                var squads = response.squads;
+                var confidence = response.confidence;
+                console.log(botResponse, results, squads);
+                if (squads){
+                var squad_response = '<div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg"><p class="text-sm">Here are related squad results:<br><br><ul>' 
+                squads.forEach( function(squad){
+                    squad_response += '<li class="text-sm"><b class="text-md">'  + squad.title  + '</b><br> City: '  +squad.city +'<br> State: '  + squad.state +'<br> Interest Name: ' +squad.interest_name + "<br></li>";
+                });
+                squad_response +='</ul></p></div>'
+                                
+                } else{
+                    var squad_response = ""
+                }
+
+                if (results){
+                    var result_html = '<br><br><p class="text-md">Here are related results:<br><br> <ul>' 
+                    results.forEach( function(result){
+                        result_html += '<li class="text-sm"><b class="text-md">'  + result['user.firstname'] + " " + result['user.lastname'] + '</b><br> City: '  +result.city +'<br> State: '  + result.state +'<br> Interest Name: ' +result['interest.name'] + "<br></li>";
+                    });
+                    result_html +='</ul></p>'
+                } else{
+                    var result_html = ""
+                }
+                $('.just-now').hide();
+                // Append user's message to the chat window
+                chatWindow.append('<div class="flex w-full mt-2 space-x-3 max-w-xs">' +
+                    '<div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>' +
+                        '<div>' +
+                            '<div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">' +
+                                '<p class="text-sm">' + botResponse + '<br>(confidence '+ confidence + ')</p>'+ result_html  +
+                              '</div>' +squad_response + 
+                                
+                            '<span class="just-now text-xs text-gray-500 leading-none">Just now</span>' +
+                        '</div>' +
+                    '</div>');
+
+                $('#spinner').addClass('hidden'); // Hide the spinner
+            },
+            error: function() {
+                $('#spinner').addClass('hidden'); // Hide the spinner on error
+            }
+        });
+    });
+});
+
+</script>
+        
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="text-5xl p-5 text-center">
+    <h1>Spinny AI Chat</h1>
+</div>
+<div class="flex flex-col items-center justify-center w-screen h-[75vh] bg-gray-100 text-gray-800 p-10">
+    <!-- Component Start -->
+    <div id="reponse-grow" class="flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden">
+        <!-- Chat messages container -->
+        <div id="chat-window" class="flex flex-col flex-grow h-0 p-4 overflow-auto">
+            <!-- Chat messages will be appended here -->
+        </div>
+
+        <!-- Message input form -->
+        <div id="spinner" class="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin hidden"></div>
+
+        <div class="bg-gray-300 p-4">
+
+            <form id="chat-form" class="flex items-center h-10 w-full rounded px-3 text-sm" method="post" action="/api/ChatGPTWebAPITester">
+
+                <input id="prompt" name="prompt" type="text" placeholder="Type your message…" class="flex-grow outline-none">
+                <button type="submit" class="ml-2 bg-blue-600 text-white px-3 py-1 rounded">Send</button>
+            </form>
+        </div>
+
+        <input type="hidden" id="bot-response" value="{{ response }}">
+
+    </div>
+    <!-- Component End  -->
+</div>
+{% endblock %}

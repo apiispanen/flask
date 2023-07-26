@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1>Spinnr AI Integration</h1>
+    <p class="lead">This webservice is created to integrate AI technologies to Spinnr Apps.</p>
+    <p><a href="https://openai.com/api/" class="btn btn-primary btn-large">Learn more about OpenAI APIs &raquo;</a></p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>ChatGPT</h2>
+        <p>
+            Perform a wide variety of natural language tasks with GPT-3.
+        </p>
+        <p>
+            Use "/api/ChatGPTWebAPI" for actual ChatGPT API calls.
+        </p>
+        <p><a class="btn btn-default" href="/api/ChatGPTWebAPITester">ChatGPT Tester &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>AI Content Moderation</h2>
+        <p>Google AI Moderation Tool to Inspect and Identify Improper Images and Videos.</p>
+        <p><a class="btn btn-default" href="/api/VideoIntelligenceAPITester">Video Intelligence API Tester &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>DALL-E</h2>
+        <p>DALL-E is an AI system that can create realistic images and art from a description in natural language. Coming Soon.</p>
+        <p><a class="btn btn-default" href="https://openai.com/dall-e-2/">Learn more &raquo;</a></p>
+    </div>
+</div>
+
+{% endblock %}

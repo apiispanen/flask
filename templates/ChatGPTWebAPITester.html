@@ -6,36 +6,25 @@
     var i = 0;
     $(function() {
       var chatWindow = $('#chat-window');
-      var responseDiv;
-    
-      function createResponseDiv() {
-        var responseDivName = "response-text-" + i;
-        responseDiv = $('<div class="bg-gray-300 p-3 mt-4 rounded-r-lg rounded-bl-lg hidden"><p class="text-sm" id="'+ responseDivName +'"></p></div>');
-        return responseDiv;
-      }
-      
-      createResponseDiv();
-      chatWindow.append(responseDiv);
-    
-      var protocol = location.protocol;
-      var socket = io.connect(protocol + '//' + document.domain + ':' + location.port);
-  
-      socket.on('response', function (data) {
-        console.log("data", data);
-    
-        var p = $('<span></span>');
-        p.addClass('text-sm');
-        var content = data['message']['content'];
-        p.text(content ? content + ' ' : ''); 
-  
-        responseDiv.children('p').append(p);
-        responseDiv.removeClass('hidden');
-        chatWindow.scrollTop(chatWindow[0].scrollHeight);
-        $('#spinner').addClass('hidden');
-      });
-      
-      socket.emit('message', { prompt: 'Hello, GPT!' });
-  
+    var protocol = location.protocol;
+    var socket = io.connect(protocol + '//' + document.domain + ':' + location.port);
+    var messageElement;
+
+    function createNewMessageElement(i) {
+        messageElement = $('<div class="bg-gray-300 p-3 mt-4 rounded-r-lg rounded-bl-lg hidden"><p class="text-sm"></p></div>');
+        chatWindow.append(messageElement);
+    }
+    socket.on('response', function (data) {
+        console.log("message", data['message']);
+        if (data['message'] && data['message']['content']) {
+          // make one h1 #title element change to the text of each response
+            var content = data['message']['content'];
+            messageElement.find('p').append('<span class="text-sm">' + content + '</span>');
+            messageElement.removeClass('hidden');
+            chatWindow.scrollTop(chatWindow[0].scrollHeight);
+            $('#spinner').addClass('hidden');
+        }
+    });
       $("#chat-form").on('submit', function(e) {
         e.preventDefault();
         var userResponse = $('#prompt').val();
@@ -55,11 +44,17 @@
         chatWindow.scrollTop(chatWindow[0].scrollHeight);
   
         i++;
-        createResponseDiv();
-        chatWindow.append(responseDiv);
+        // createResponseDiv();
+        // chatWindow.append(responseDiv);
+        createNewMessageElement(i);
+
       });
     
+      createNewMessageElement();
+      socket.emit('message', { prompt: 'Well hi there!' });
+  
       function handleFileUpload(event) {
+        console.log("file is being uploaded");
         var file = event.target.files[0];
     
         if (file) {
@@ -67,7 +62,20 @@
     
           reader.onload = function(e) {
             var base64Data = e.target.result.split(',')[1];
-            socket.emit('process', { files: base64Data });
+            
+            // do an ajax request to /api/vectorize with the base64 data:
+            $.ajax({
+              url: '/api/vectorize',
+              method: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify({ data: base64Data }),
+              success: function(data) {
+                console.log("data", data);
+                socket.emit('process', { files: data['files'] });
+              }
+            });
+            
+            // socket.emit('process', { files: base64Data });
           };
     
           reader.readAsDataURL(file);
@@ -82,7 +90,7 @@
 
 {% block content %}
 <div class="text-5xl p-5 text-center">
-    <h1>Direct Machines AI Chat</h1>
+    <h1 id="title">Direct Machines AI Chat</h1>
 </div>
 <div class="flex flex-col items-center justify-center w-screen h-[75vh] bg-gray-100 text-gray-800 p-10">
     <!-- Component Start -->

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 #openai chatgpt parameters
-engine = "gpt-3.5-turbo"
-max_tokens = 1024
+engine = "text-davinci-003"
+max_tokens = 100
 top_p = 0.9
 
 # Invalid Request Error Messages
@@ -12,4 +12,6 @@ timeOutErrorMessage = "Got stuck in a wormhole 💫 The space-time continuum can
 anyOtherExceptionErrorMessage = "Time-space glitch, be back in a jiffy! 🌌🚀";
 
 #Emoji Request
-appendEmojiRequest = ''
+appendEmojiRequest = ' (give me the long answer and add emojis to answer context)'
+
+foundResults = 'Here are some results I found in our database related to this:\n'
