@@ -165,33 +165,6 @@ def ChatGPTWebAPI():
     print("result_dict: ", result_dict)
     return result_dict
 
-@app.route('/api/getUserIntro', methods=['GET'])
-def getUserIntro():
-    try:
-        guid = request.args.get('guid')
-        username = request.args.get('username')
-        user_summary = helpers.get_user_summary(guid, username)
-        print("user_summary: ", user_summary)
-        prompt = f'Please introduce this user based on their data: \n\n {user_summary} \n\n'
-        print(prompt)
-        prompt = helpers.AddEmojiRequestToPrompt(prompt)
-        messages = [{"role": "user", "content": prompt}]
-
-        response = openai.ChatCompletion.create( 
-            model="gpt-3.5-turbo-0301",
-            messages=messages,
-            max_tokens=config.max_tokens,
-            n=1,
-            stop=None,
-            temperature=config.top_p,
-            frequency_penalty=1
-        )
-        user_intro = response["choices"][0]["message"]["content"].strip()
-        return jsonify({"message": user_intro})
-    except Exception as e:
-        # For any other exception
-        return jsonify({"message": config.anyOtherExceptionErrorMessage})
-
 @app.route('/api/ChatGPTWebAPITester', methods=['GET', 'POST'])
 def chatGPTWebAPITester():
     try:
@@ -247,46 +220,44 @@ def VideoIntelligenceAPITester():
         # For any other exception
         return jsonify({"message": config.anyOtherExceptionErrorMessage})
 
+@socketio.on('message')
+def handle_message(data):
+    global messages
+    prompt = data['prompt']
+    temperature = config.top_p
 
-
-# @socketio.on('message')
-# def handle_message(data):
-#     global messages
-#     prompt = data['prompt']
-#     temperature = config.top_p
-
-#     # Add the new user message to the messages list.
-#     messages.append({"role": "user", "content": prompt})
+    # Add the new user message to the messages list.
+    messages.append({"role": "user", "content": prompt})
     
-#     # Keep only the last 5 messages.
-#     messages = messages[-5:]
+    # Keep only the last 5 messages.
+    messages = messages[-5:]
 
-#     # result_dict = classification.query_intent(prompt)
-#     result_dict = {"squads": {}, "results": [], "response": ""}
-#     if result_dict['squads'] != {} or result_dict['results'] != []:
-#         prompt = prompt + config.foundResults + f'{result_dict}'
+    # result_dict = classification.query_intent(prompt)
+    result_dict = {"squads": {}, "results": [], "response": ""}
+    if result_dict['squads'] != {} or result_dict['results'] != []:
+        prompt = prompt + config.foundResults + f'{result_dict}'
 
-#     response = openai.ChatCompletion.create(
-#         model='gpt-3.5-turbo',
-#         messages=messages,
-#         temperature=temperature,
-#         stream=True
-#     )
-#     full_response = ""
-#     for chunk in response:
-#         chunk_message = chunk['choices'][0]['delta']
-#         # Add the new assistant message to the messages list.
-#         try: 
-#             full_response += chunk_message['content']
-#         except:
-#             print("No content in chunk message", chunk_message)
-#         socketio.emit('response', {"message": chunk_message})
-#     messages.append({"role": "assistant", "content": full_response})
-#     # Keep only the last 5 messages.
-#     messages = messages[-5:]
+    response = openai.ChatCompletion.create(
+        model='gpt-4',
+        messages=messages,
+        temperature=temperature,
+        stream=True
+    )
+    full_response = ""
+    for chunk in response:
+        chunk_message = chunk['choices'][0]['delta']
+        # Add the new assistant message to the messages list.
+        try: 
+            full_response += chunk_message['content']
+        except:
+            print("No content in chunk message", chunk_message)
+        socketio.emit('response', {"message": chunk_message})
+    messages.append({"role": "assistant", "content": full_response})
+    # Keep only the last 5 messages.
+    messages = messages[-5:]
 
-# if __name__ == '__main__':
-#     socketio.run(app)
+if __name__ == '__main__':
+    socketio.run(app)
 
 # THE FUNCTIONS SHOULD:
 # 1. Take in a prompt, understand intents, and return a response

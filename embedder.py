@@ -15,9 +15,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 # from SpinnrAIWebService import apiconfig
-import apiconfig
+# import apiconfig
 import os
-import openai
+# import openai
 
 # add OPENAI_API_KEY as an env
 
@@ -26,7 +26,7 @@ def get_vector_results(query, pdf):
     text = ""
     for page in pdf_reader.pages:
         text += page.extract_text()
-    print(text)
+    # print(text)
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=750,
@@ -37,7 +37,7 @@ def get_vector_results(query, pdf):
 
     # # embeddings
     store_name = pdf[:-4]
-    print(f'{store_name}')
+    # print(f'{store_name}')
     # st.write(chunks)
 
     if os.path.exists(f"{store_name}.pkl"):
@@ -56,6 +56,7 @@ def get_vector_results(query, pdf):
 
     # query = input("Ask questions about your PDF file:")
     docs = VectorStore.similarity_search(query=query, k=1)
+    # print the content of the docs
     return docs
 
-# print(get_vector_results('What is the name of the author?', 'test.pdf'))
+# print(get_vector_results('What is doall\'s guarantee?', 'doall.pdf')[0].page_content)
