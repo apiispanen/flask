@@ -98,7 +98,7 @@ function handleFileUpload(event) {
               data: JSON.stringify({ data: base64Data }),
               success: function(data) {
                 console.log("data", data);
-                socket.emit('process', { files: data['files'] });
+                // socket.emit('process', { files: data['files'] });
               }
             });
             
@@ -108,7 +108,10 @@ function handleFileUpload(event) {
           reader.readAsDataURL(file);
         }
       }
-      document.getElementById('file-upload').addEventListener('change', handleFileUpload, false);
+      
+      document.addEventListener('DOMContentLoaded', (event) => {
+  document.getElementById('file-upload').addEventListener('change', handleFileUpload, false);
+});
 
 
 </script>

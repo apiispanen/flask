@@ -55,8 +55,11 @@ def get_vector_results(query, pdf):
     VectorStore = FAISS.from_texts(chunks, embedding=embeddings)
 
     # query = input("Ask questions about your PDF file:")
-    docs = VectorStore.similarity_search(query=query, k=1)
+    if query == '':
+        return []
+    else:
+        docs = VectorStore.similarity_search(query=query, k=1)
     # print the content of the docs
     return docs
 
-# print(get_vector_results('What is doall\'s guarantee?', 'doall.pdf')[0].page_content)
+# print(get_vector_results('what\'s tanvir\'s cgpa?', 'temp_pdf_file.pdf')[0].page_content)
