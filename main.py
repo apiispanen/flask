@@ -8,7 +8,7 @@ from flask_session import Session
 import os
 from datetime import datetime
 from flask_socketio import SocketIO, emit
-import classification, config
+import config
 import openai
 import json
 from dotenv import load_dotenv
@@ -164,7 +164,8 @@ def ChatGPTWebAPI():
         )
         message = completions.choices[0].text.strip()
         message=""
-        query = classification.query_intent(prompt)
+        # query = classification.query_intent(prompt)
+        query = "SELECT * FROM table WHERE entities = 'entities'"
         # if entities == ""
         print("query: ", query)
         return jsonify({"message": message, "query":query})
