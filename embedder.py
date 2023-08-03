@@ -39,26 +39,29 @@ def get_vector_results(query, pdf):
     store_name = pdf[:-4]
     # print(f'{store_name}')
     # st.write(chunks)
+    try:
+        if os.path.exists(f"{store_name}.pkl"):
+            with open(f"{store_name}.pkl", "rb") as f:
+                VectorStore = pickle.load(f)
+            print('Embeddings Loaded from the Disk')
+        else:
+            print('Making new path')
+            embeddings = OpenAIEmbeddings()
+            VectorStore = FAISS.from_texts(chunks, embedding=embeddings)
+            with open(f"{store_name}.pkl", "wb") as f:
+                pickle.dump(VectorStore, f)
 
-    if os.path.exists(f"{store_name}.pkl"):
-        with open(f"{store_name}.pkl", "rb") as f:
-            VectorStore = pickle.load(f)
-        print('Embeddings Loaded from the Disk')
-    else:
-        print('Making new path')
         embeddings = OpenAIEmbeddings()
         VectorStore = FAISS.from_texts(chunks, embedding=embeddings)
-        with open(f"{store_name}.pkl", "wb") as f:
-            pickle.dump(VectorStore, f)
 
-    embeddings = OpenAIEmbeddings()
-    VectorStore = FAISS.from_texts(chunks, embedding=embeddings)
-
-    # query = input("Ask questions about your PDF file:")
-    if query == '':
+        # query = input("Ask questions about your PDF file:")
+        if query == '':
+            return []
+        else:
+            docs = VectorStore.similarity_search(query=query, k=1)
+    except Exception as e:
+        print("*!*!*!*!ERRORRRR",e)
         return []
-    else:
-        docs = VectorStore.similarity_search(query=query, k=1)
     # print the content of the docs
     return docs
 
