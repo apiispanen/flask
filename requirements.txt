@@ -20,4 +20,4 @@ gevent
 Flask-Session
 PyPDF2
 langchain
-faiss-gpu
+faiss-cpu
