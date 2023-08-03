@@ -24,8 +24,30 @@
     var p = $('<b></b>');
     p.addClass('text-sm');
     p.text(data['message']['content']);
-    p.text(data['results_dict']);
 
+
+    // try to get the result_dict
+    var result_dict = data['results_dict'];
+    console.log("result_dict", result_dict);
+    // if results_dict is not null, then add the results_dict to the response text
+    if (result_dict != null) {
+    console.log("result_dict is not null");
+    p.text(data['results_dict']);
+        
+    var intent_h = $('#intent');
+    var entity_h = $('#entities');
+    var query_h = $('#query');
+    var results_h = $('#results');
+
+
+    intent_h.text(data['results_dict']['intent']);
+    entity_h.text(data['results_dict']['entities']);
+    query_h.text(data['results_dict']['query']);
+    }
+    else {
+        console.log("result_dict is null");
+    }
+    
     console.log(i);
     console.log("data", data);  // The squads value
     
@@ -148,5 +170,13 @@ function handleFileUpload(event) {
 
     </div>
     <!-- Component End  -->
+    <div class="text-left p-5">
+        <h2 class="text-4xl uppercase">Response Data</h2>
+        <h4>Intent: <b id="intent"></b></h4>
+        <h4>Entities: <b id="entities"></b></h4>
+        <h4>Query: <b id="query"></b></h4>
+        <h4>Results: <b id="results"></b></h4>
+
+    </div>
 </div>
 {% endblock %}

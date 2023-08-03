@@ -125,10 +125,9 @@ def handle_message(data):
     # Keep only the last 5 messages.
     messages = messages[-5:]
 
-    # result_dict = classification.query_intent(prompt)
-    result_dict = {"squads": {}, "results": [], "response": ""}
-    if result_dict['squads'] != {} or result_dict['results'] != []:
-        prompt = prompt + config.foundResults + f'{result_dict}'
+    # result_dict = {"squads": {}, "results": [], "response": ""}
+    # if result_dict['squads'] != {} or result_dict['results'] != []:
+    #     prompt = prompt + config.foundResults + f'{result_dict}'
 
     response = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
@@ -146,6 +145,9 @@ def handle_message(data):
             print("No content in chunk message", chunk_message)
         socketio.emit('response', {"message": chunk_message})
     messages.append({"role": "assistant", "content": full_response})
+    
+    result_dict = classification.query_intent(prompt)
+    socketio.emit('response', {'message':{'content':''}, 'results_dict':{"intent": result_dict['intent'], "entities": result_dict['entities'], "query":result_dict['query']}})  # send the chunk message and result_dict to the client
     # print("VECTOR",get_vector_results(full_response, 'doall.pdf'))
     # Keep only the last 5 messages.
     messages = messages[-5:]

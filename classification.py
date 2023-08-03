@@ -128,7 +128,7 @@ print(np.array(y_train).shape)
 
 
 def predict_intent(text):
-    return pipeline.predict([text])[0]
+    return pipeline.predict([text])[0],  pipeline.predict_proba([text]).max()
 
 
 # # NOW LETS RUN THE MODEL FOR INTENTS
@@ -144,9 +144,9 @@ def predict_intent(text):
 def query_intent(text):
     # text = request.json.get('text')
     try:
-        intent = predict_intent(text) # Can be done with the NLP cloud API
+        intent, confidence = predict_intent(text) # Can be done with the NLP cloud API
     except Exception as e:
-        intent = ""
+        intent , confidence = "", ""
         print("(*&@#(!*@#*&!@#*&^#*&^#*&!^@#*&!^@# ERROR:",e)
     try:
         entities = extract_entities(text)
@@ -163,7 +163,8 @@ def query_intent(text):
     except Exception as e:
         print("(*&@#(!*@#*&!@#*&^#*&^#*&!^@#*&!^@# ERROR:",e)
         results = ""
-    return intent, entities, query, results
+    return     {"intent":intent, "confidence": confidence, "entities":' '.join(entities), "query": query}
+
 
 
 # Note: GPE is geopolitical entity
