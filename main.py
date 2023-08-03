@@ -228,7 +228,8 @@ def chatGPTWebAPITester():
 
 if __name__ == '__main__':
     # socketio.run(app)
-    app.run(host='0.0.0.0', port=5555)
+    app.run(host='0.0.0.0')
+    # app.run(host='0.0.0.0', port=5555)
 
 
 # if __name__ == '__main__':
